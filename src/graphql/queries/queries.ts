@@ -2,96 +2,96 @@ import { gql } from '@apollo/client'; // Import the gql tag from Apollo Client f
 
 // Define the query to get a manager by ID
 export const GET_MANAGER_QUERY = gql`
-  query GetManager($id: Int!) {
-    manager(id: $id) {
-      manager_id
-      manager_no
-      name
-      surname
-      email
-      phone
-      role
-      status
-      created_at
-      updated_at
+    query GetManager($id: Int!) {
+        manager(id: $id) {
+            manager_id
+            manager_no
+            name
+            surname
+            email
+            phone
+            role
+            status
+            created_at
+            updated_at
+        }
     }
-  }
 `;
 
 // Define the query to get a list of managers
 export const SHIPMENTS_QUERY = gql`
-  query Shipments($search: String, $status: String, $page: Int, $limit: Int) {
-    shipments(search: $search, status: $status, page: $page, limit: $limit) {
-      total
-      pages
-      items {
-        id
-        order_no
-        tracking_no
-        note
-        amount
-        status
-        shipment_type  
-        order_type         
-        created_by
-        created_at
-        updated_at
-        delivered_date
-        label               
-      }
+    query Shipments($search: String, $status: String, $page: Int, $limit: Int) {
+        shipments(search: $search, status: $status, page: $page, limit: $limit) {
+            total
+            pages
+            items {
+                id
+                order_no
+                tracking_no
+                note
+                amount
+                status
+                shipment_type  
+                order_type         
+                created_by
+                created_at
+                updated_at
+                delivered_date
+                label               
+            }
+        }
     }
-  }
 `;
 
 
 // Define the query to get a shipment by ID
 export const SHIPMENT_QUERY = gql`
-  query Shipment($shipment_id: String!) {
-    shipment(shipment_id: $shipment_id) {
-      order {
-        shipment {
-          id
-          order_no
-          tracking_no
-          note
-          amount
-          status
-          shipment_type
-          order_type
-          created_by
-          created_at
-          updated_at
-          delivered_date
-          label
-          branches {
-            sender {
-              id name phone state city district address
+    query Shipment($shipment_id: String!) {
+        shipment(shipment_id: $shipment_id) {
+            order {
+                shipment {
+                    id
+                    order_no
+                    tracking_no
+                    note
+                    amount
+                    status
+                    shipment_type
+                    order_type
+                    created_by
+                    created_at
+                    updated_at
+                    delivered_date
+                    label
+                    branches {
+                        sender {
+                            id name phone state city district address
+                        }
+                        received {
+                            id name phone state city district address
+                        }
+                    }
+                }
+                customers {
+                    sender {
+                        id name phone state city district address
+                    }
+                    received {
+                        id name phone state city district address
+                    }
+                }
+                items {
+                    id name price quantity amount status
+                }
+                invoices {
+                    id invoice_no payment_method currency amount shipping_price total status received_by created_at updated_at
+                }
+                tracking {
+                    id tracking_no status tracking_type tracking note location updated_by updated_at
+                }
             }
-            received {
-              id name phone state city district address
-            }
-          }
         }
-        customers {
-          sender {
-            id name phone state city district address
-          }
-          received {
-            id name phone state city district address
-          }
-        }
-        items {
-          id name price quantity amount status
-        }
-        invoices {
-          id invoice_no payment_method currency amount shipping_price total status received_by created_at updated_at
-        }
-        tracking {
-          id tracking_no status tracking_type tracking note location updated_by updated_at
-        }
-      }
     }
-  }
 `;
 
 // Define the query to get a list of users
@@ -138,4 +138,73 @@ export const GET_LOCATIONS = gql`
             name
         }
     }
+`;
+
+// Define the query to get a list of users
+export const GET_USER_QUERY = gql`
+query User($user_id: String!, $stateCode: String, $cityCode: String, $stateName: String) {
+    user(user_id: $user_id) {
+        user {
+            id
+            name
+            surname
+            phone
+            email
+            code
+            number
+            role
+            user_type
+            status
+            created_at
+            updated_at
+        }
+        address {
+            id
+            name
+            phone
+            address_type
+            state
+            city
+            district
+            address
+            created_at
+            updated_at
+        }
+        balance {
+            id
+            amount
+            currency
+            created_at
+            updated_at
+        }
+        client {
+            name
+            number
+            level
+            client_type
+            parent_name
+            parent_number
+            parent_level
+            branch_name
+            created_at
+            updated_at
+        }
+    }
+    states {
+        state_code
+        state_name
+    }
+    cities(state_code: $stateCode) {
+        city_code
+        city_name
+    }
+    districts(city_code: $cityCode) {
+        district_id
+        district_name
+    }
+    branches(state_name: $stateName) {
+        user_id
+        name
+    }
+}
 `;

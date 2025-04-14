@@ -48,6 +48,7 @@ export default function Layout({ children }: LayoutProps) {
             return false;
         }
     };
+    
 
     // Show a simple loading screen if we're still checking the token
     if (loading) {
@@ -60,6 +61,7 @@ export default function Layout({ children }: LayoutProps) {
 
     return (
         <div className="flex min-h-screen" dir="rtl">
+            
             {/* Sidebar */}
             <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 

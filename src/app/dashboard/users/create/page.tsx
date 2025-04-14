@@ -7,39 +7,13 @@ import RoleSelector from "@/components/users/create/RoleSelector";
 import { GET_LOCATIONS } from "@/graphql/queries/queries";
 import { CREATE_USER_MUTATION } from "@/graphql/mutations/userMutation";
 import { LocationData, LocationVariables } from "@/graphql/types/statesType";
+import { CreateUserInput, CreateUserResponse } from "@/graphql/types/UsersTypes";
 import Toast from "@/components/Toast";
 
-export interface CreateUserInput {
-    role: string;
-    surname: string;
-    phone: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    address_name: string;
-    address_phone: string;
-    state: string;
-    city: string;
-    district: string;
-    address: string;
-    branch_id: string;
-    client_type: string;
-    balance: number;
-    currency: string;
-    userType: string;
-    name: string;
-}
-
-interface CreateUserResponse {
-    createUser: {
-        id: string;
-        number: string;
-        message: string;
-    };
-}
 
 
-export default function CreatePage() {
+
+export default function CreatePage() {  
     // ---- State to track which step we are on ----
     const [step, setStep] = useState(1);
 
@@ -53,6 +27,9 @@ export default function CreatePage() {
     const [selectedStateName, setSelectedStateName] = useState("");
     const [selectedCityName, setSelectedCityName] = useState("");
     const [selectedDistrictName, setSelectedDistrictName] = useState("");
+
+    //---- Branch name (populated in useEffect) ----
+    const [selectedBranchName, setSelectedBranchName] = useState("");
 
     // ---- GraphQL mutation for creating a user ----
     const [createUser, { loading: mutationLoading, error: mutationError }] = useMutation<CreateUserResponse, CreateUserInput>(CREATE_USER_MUTATION);
@@ -89,7 +66,7 @@ export default function CreatePage() {
     });
 
     // ---- GraphQL query for locations ----
-    const { data, loading , error, refetch } = useQuery<LocationData, LocationVariables>(
+    const { data, loading, error, refetch } = useQuery<LocationData, LocationVariables>(
         GET_LOCATIONS,
         {
             variables: {
@@ -141,7 +118,7 @@ export default function CreatePage() {
             setSelectedStateName("");
             return;
         }
-        const foundState = data.states.find((s) => s.state_code === selectedState);
+        const foundState = data.states.find((s) => s.state_code === formData.state);
         setSelectedStateName(foundState?.state_name || "");
     }, [selectedState, data?.states]);
 
@@ -151,9 +128,23 @@ export default function CreatePage() {
             setSelectedCityName("");
             return;
         }
-        const foundCity = data.cities.find((c) => c.city_code === selectedCity);
+        const selectedCode = parseInt(selectedCity); // تحويل إلى رقم صحيح
+        const foundCity = data?.cities?.find((c) => parseInt(c.city_code) === selectedCode);
         setSelectedCityName(foundCity?.city_name || "");
+
     }, [selectedCity, data?.cities]);
+
+    useEffect(() => {
+        if (!selectedBranch || !data?.branches) {
+            setSelectedBranchName("");
+            return;
+        }
+        const foundBranch = data?.branches.find(
+            (b) => b.user_id === selectedBranch
+        );
+        setSelectedBranchName(foundBranch?.name || "");
+    }, [selectedBranch, data?.branches]);
+    
 
     // ---- (5) Update selectedDistrictName whenever selectedDistrict or data changes ----
     useEffect(() => {
@@ -161,8 +152,9 @@ export default function CreatePage() {
             setSelectedDistrictName("");
             return;
         }
+        const selectedCode = parseInt(selectedDistrict); // تحويل إلى رقم صحيح
         const foundDistrict = data.districts.find(
-            (d) => d.district_id === selectedDistrict
+            (d) => parseInt(d.district_id) === selectedCode
         );
         setSelectedDistrictName(foundDistrict?.district_name || "");
     }, [selectedDistrict, data?.districts]);
@@ -232,9 +224,6 @@ export default function CreatePage() {
         } else {
             setFormData({ ...formData, [name]: value });
         }
-
-
-
     };
 
 
@@ -250,8 +239,9 @@ export default function CreatePage() {
 
         // Prepare submission data, excluding 'acceptTerms'
         const { acceptTerms, ...submitData } = formData;
-        
+
         try {
+            // Call the mutation to create a user
             const result = await createUser({
                 variables: {
                     ...submitData,
@@ -262,11 +252,35 @@ export default function CreatePage() {
             if (result.data?.createUser) {
                 setToast({ message: result.data.createUser.message, type: "success" });
                 // Optionally reset form or navigate to another page
+                setFormData({
+                    role: "",
+                    type: "",
+                    name: "",
+                    surname: "",
+                    phone: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: "",
+                    address_name: "",
+                    address_phone: "",
+                    state: "",
+                    city: "",
+                    district: "",
+                    address: "",
+                    branch_id: "",
+                    client_type: "",
+                    balance: 0,
+                    currency: "IQD",
+                    acceptTerms: false,
+                });
+                setStep(1); // Reset to step 1
             }
         } catch (err) {
             if (err instanceof Error) {
+                // Handle specific error messages based on your GraphQL server response
                 setToast({ message: err.message, type: "danger" });
             } else {
+                // Handle unknown errors
                 setToast({ message: "An unknown error occurred", type: "danger" });
             }
         }
@@ -468,7 +482,11 @@ export default function CreatePage() {
                                     <label htmlFor="city" className="block mb-2 text-sm font-medium text-gray-900">
                                         المدينة <span className="text-red-600">*</span>
                                     </label>
-                                    <select id="city" name="city" value={selectedCity} onChange={(e) => { setSelectedCity(e.target.value); setSelectedDistrict(""); handleChange(e); }} disabled={!selectedState}
+                                    <select id="city" name="city" value={selectedCity} onChange={
+                                        (e) => { setSelectedCity(e.target.value); setSelectedDistrict(""); handleChange(e); 
+
+                                        }
+                                    } disabled={!selectedState}
                                         className="w-full py-1 border border-gray-300 bg-gray-50 rounded-md focus:outline-none text-sm focus:ring-primary focus:border-primary text-right">
                                         <option value="">اختر المدينة</option>
                                         {data?.cities?.map((city) => (
@@ -488,7 +506,7 @@ export default function CreatePage() {
                                         className="w-full py-1 border border-gray-300 bg-gray-50 rounded-md focus:outline-none text-sm focus:ring-primary focus:border-primary text-right">
                                         <option value="">اختر الحي</option>
                                         {data?.districts?.map((district) => (
-                                            <option key={district.district_id} value={district.district_id}>
+                                            <option key={district.district_id} value={district.district_id} >
                                                 {district.district_name}
                                             </option>
                                         ))}
@@ -753,7 +771,7 @@ export default function CreatePage() {
                                                         الفرع
                                                     </p>
                                                     <div className="inline-flex items-center text-sm font-semibold text-gray-900">
-                                                        {formData.branch_id}
+                                                        {selectedBranchName}
                                                     </div>
                                                 </div>
                                             </li>
@@ -880,9 +898,8 @@ export default function CreatePage() {
 
                         {/* Submit Button */}
                         {step === 5 && (
-                            <button type="submit" className="px-3 py-2 mx-3 text-sm font-medium text-center text-white bg-primary hover:bg-gray-600 rounded-md">
-                                <i className="fas fa-check mx-1"></i>
-                                إنشاء المستخدم
+                            <button type="submit" className={`px-3 py-2 mx-3 text-sm font-medium text-center text-white hover:bg-gray-600 rounded-md ${mutationLoading ? 'bg-gray-600 cursor-not-allowed' : 'bg-primary'}`} disabled={mutationLoading}>
+                                {mutationLoading ? "جارٍ إنشاء الحساب..." : "إنشاء الحساب"}
                             </button>
                         )}
                     </div>

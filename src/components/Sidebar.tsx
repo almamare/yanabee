@@ -65,15 +65,15 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       title: 'الملفات التعريفية',
       items: [
         { label: 'المستخدمين', link: '/dashboard/users', icon: 'far fa-users' },
-        { label: 'المنتجات', link: '#', icon: 'far fa-tags' },
-        { label: 'الفئات', link: '#', icon: 'far fa-th-large'},
+        { label: 'المنتجات', link: '/dashboard/products', icon: 'far fa-tags' },
+        { label: 'الفئات', link: '/dashboard/categories', icon: 'far fa-th-large'},
       ],
     },
     {
       title: 'الأعدادات',
       items: [
-        { label: 'التقييم', link: '#', icon: 'far fa-star'},
-        { label: 'العلانات', link: '#', icon: 'far fa-ad' },
+        { label: 'التقييمات', link: '/dashboard/ratings', icon: 'far fa-star'},
+        { label: 'العلانات', link: '/dashboard/advertisements', icon: 'far fa-ad' },
         { label: 'الاعدادات', link: '#', icon: 'far fa-cog' },
         { label: 'التعليمات', link: '#', icon: 'far fa-question-square' },
       ],
