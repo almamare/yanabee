@@ -65,21 +65,32 @@ export default function RatingsPage() {
             const { data } = await deleteRating({
                 variables: { id: ratingId },
             });
+    
             if (data.deleteRating.status === true) {
                 setShowConfirm(false);
                 setToast({ message: data.deleteRating.message, type: "success" });
+    
+                // Remove the deleted rating from local state
                 setRatings((prev) => prev.filter((rating) => rating.id !== ratingId));
             }
-        } catch (err) {
-            if (err instanceof Error) {
-                // Handle specific error messages based on your GraphQL server response
+        } catch (err: any) {
+            // Check if the error is a GraphQL error
+            if (err?.graphQLErrors && Array.isArray(err.graphQLErrors)) {
+                err.graphQLErrors.forEach((graphqlError: any) => { const validTypes: Array<"success" | "danger" | "warning" | "info"> = ["success", "danger", "warning", "info"];
+                    // Extract type from error extensions code or default to "danger"
+                    const toastType = validTypes.includes(graphqlError.extensions?.code) ? (graphqlError.extensions.code as "success" | "danger" | "warning" | "info") : "danger";
+                    setToast({ message: graphqlError.message, type: toastType });
+                });
+            } else if (err instanceof Error) {
+                // Generic JS error
                 setToast({ message: err.message, type: "danger" });
             } else {
-                // Handle unknown errors
+                // Unknown error
                 setToast({ message: "An unknown error occurred", type: "danger" });
             }
         }
-    }
+    };
+    
 
     // Debounce the search input to avoid excessive API calls
     const debouncedSearch = useCallback(
@@ -100,7 +111,9 @@ export default function RatingsPage() {
 
         if (error) {
             error.graphQLErrors.forEach((err) => {
-                setToast({ message: err.message, type: "warning" });
+                const validTypes: Array<"success" | "danger" | "warning" | "info"> = ["success", "danger", "warning", "info"];
+                const toastType = validTypes.includes(err.extensions?.code as any)? (err.extensions?.code as "success" | "danger" | "warning" | "info"): "danger";
+                setToast({ message: err.message, type: toastType });
             });
         }
     }, [data, error]);
@@ -245,7 +258,7 @@ export default function RatingsPage() {
                                             {new Date(item.created_at).toLocaleString()}
                                         </td>
                                         <td className="py-2 px-2 border border-slate-200">
-                                            <button className="px-3 py-1 text-xs font-medium text-center text-white bg-red-600 hover:bg-gray-600 rounded-md" onClick={() => { setSelectedRatingId(item.id); setShowConfirm(true); }}>
+                                            <button className="px-3 py-1 text-xs font-medium text-center text-white bg-red-600 hover:bg-red-700 rounded-md" onClick={() => { setSelectedRatingId(item.id); setShowConfirm(true); }}>
                                                 حذف
                                             </button>
                                         </td>
