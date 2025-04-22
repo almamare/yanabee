@@ -11,7 +11,7 @@ import Toast from "@/components/Toast";                              // Re‑usa
    ======================= */
 
 // 1) Fetch all users (we’ll filter in the UI if needed)
-export const GET_USERS = gql`
+ const GET_USERS = gql`
     query Users ($role: String!, $limit: Int) {
         users(role: $role, limit: $limit) {
             items {
@@ -24,7 +24,7 @@ export const GET_USERS = gql`
 `;
 
 // 2) Create a new package / pricing record
-export const CREATE_PACKAGE = gql`
+ const CREATE_PACKAGE = gql`
     mutation CreatePackage(
         $user_id: String
         $name: String
