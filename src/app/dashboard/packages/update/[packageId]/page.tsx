@@ -11,7 +11,7 @@ import Toast from "@/components/Toast";
    ======================= */
 
 // 1) Get single package by ID (for editing)
-export const GET_PACKAGE = gql`
+ const GET_PACKAGE = gql`
   query Package($id: String!) {
     package(id: $id) {
       id
@@ -23,7 +23,7 @@ export const GET_PACKAGE = gql`
 `;
 
 // 2) Update existing package / pricing record
-export const UPDATE_PACKAGE = gql`
+ const UPDATE_PACKAGE = gql`
   mutation UpdatePackage(
     $id: String!
     $name: String
