@@ -127,14 +127,14 @@ export default function CreateCategory() {
                                     اسم الفئة <span className="text-red-500">*</span>
                                 </label>
                                 <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: إلكترونيات"
-                                    className="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary px-2 py-1" required />
+                                    className="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1" required />
                             </div>
 
                             <div>
                                 <label htmlFor="categoryType" className="block mb-1 text-sm font-medium text-gray-700">
                                     نوع الفئة <span className="text-red-500">*</span>
                                 </label>
-                                <select id="categoryType" value={categoryType} onChange={(e) => handleCategoryTypeChange(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary px-2 py-1 w-full" required >
+                                <select id="categoryType" value={categoryType} onChange={(e) => handleCategoryTypeChange(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1 w-full" required >
                                     <option value="">اختر النوع</option>
                                     <option value={MAIN_TYPE}>{MAIN_TYPE}</option>
                                     <option value={SUB_TYPE}>{SUB_TYPE}</option>
@@ -151,7 +151,7 @@ export default function CreateCategory() {
                                     {mainCatsLoading ? (
                                         <p className="text-sm text-gray-500">جاري التحميل...</p>
                                     ) : (
-                                        <select id="parentId" value={parentId} onChange={(e) => setParentId(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary px-2 py-1 w-full" required >
+                                        <select id="parentId" value={parentId} onChange={(e) => setParentId(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1 w-full" required >
                                             <option value="">اختر فئة رئيسية</option>
                                             {mainCatsData?.categories?.items?.map(
                                                 (cat: { id: number; name: string }) => (
@@ -171,7 +171,7 @@ export default function CreateCategory() {
                                     الوصف
                                 </label>
                                 <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3}
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary px-2 py-1 w-full" placeholder="وصف مختصر عن الفئة" />
+                                    className="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1" placeholder="وصف مختصر عن الفئة" />
                             </div>
 
                             {/* ---- رفع الصورة ---- */}

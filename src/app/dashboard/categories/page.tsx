@@ -185,7 +185,7 @@ export default function CategoriesPage() {
 
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                        <select id="entries" className="px-3 py-1 border border-gray-300 bg-gray-50 rounded-md focus:outline-none text-sm focus:ring-primary focus:border-primary text-right mx-2"
+                        <select id="entries" className="px-3 py-1 border border-gray-300 bg-gray-50 rounded-md text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none text-right mx-2"
                             value={itemsPerPage} onChange={(e) => { setPage(1); setItemsPerPage(Number(e.target.value)); }} >
                             <option value="5">5</option>
                             <option value="10">10</option>
@@ -202,7 +202,7 @@ export default function CategoriesPage() {
                             البحث
                         </label>
                         <input id="search" type="text" placeholder="ابحث عن فئة..." onChange={(e) => debouncedSearch(e.target.value)}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:outline-none focus:ring-primary focus:border-primary block px-2 py-1" />
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1" />
                     </div>
                 </div>
 

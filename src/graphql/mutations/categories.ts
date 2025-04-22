@@ -42,3 +42,15 @@ export const DELETE_CATEGORY = gql`
         }
     }
 `;
+
+
+export const GET_SUB_CATEGORIES = gql`
+  query SubCategories($parent_id: String!) {
+    categories(parent_id: $parent_id, category_type: "فرعي") {
+      items {
+        id
+        name
+      }
+    }
+  }
+`;

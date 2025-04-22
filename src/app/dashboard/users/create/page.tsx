@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery, useMutation } from "@apollo/client";
 import RoleSelector from "@/components/users/create/RoleSelector";
 import { GET_LOCATIONS } from "@/graphql/queries/queries";
-import { CREATE_USER_MUTATION } from "@/graphql/mutations/userMutation";
+import { CREATE_USER_MUTATION } from "@/graphql/mutations/users";
 import { LocationData, LocationVariables } from "@/graphql/types/statesType";
 import { CreateUserInput, CreateUserResponse } from "@/graphql/types/UsersTypes";
 import Toast from "@/components/Toast";

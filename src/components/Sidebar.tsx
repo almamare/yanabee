@@ -38,22 +38,17 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             items: [
                 { label: 'لوحة التحكم', link: '/dashboard', icon: 'far fa-tachometer-alt-fast' },
                 { label: 'الطلبات', link: '/dashboard/orders', icon: 'far fa-box-alt' },
-                { label: 'التقارير', link: '', icon: 'far fa-chart-bar' },
+                { label: 'التقارير', link: '#', icon: 'far fa-chart-bar' },
                 { label: 'الاستعلام', link: '#', icon: 'far fa-search' },
                 { label: 'التنبيهات', link: '/dashboard/notifications', icon: 'far fa-bell' },
-            ],
-        },
-        {
-            title: 'المتابعة',
-            items: [
-                { label: 'تتبع الطلب', link: '#', icon: 'far fa-route' },
                 { label: 'المحادثات', link: '#', icon: 'far fa-comment-alt', badge: 5 },
+
             ],
         },
         {
             title: 'الحسابات',
             items: [
-                { label: 'المعاملات', link: '/dashboard/transactions', icon: 'far fa-exchange-alt'},
+                { label: 'المعاملات', link: '/dashboard/transactions', icon: 'far fa-exchange-alt' },
                 { label: 'السندات', link: '/dashboard/bonds', icon: 'far fa-file-alt' },
                 { label: 'الفواتير', link: '/dashboard/invoices', icon: 'far fa-file-invoice' },
                 { label: 'الأيصالات', link: '/dashboard/receipts', icon: 'far fa-receipt' },
@@ -67,6 +62,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 { label: 'المستخدمين', link: '/dashboard/users', icon: 'far fa-users' },
                 { label: 'المنتجات', link: '/dashboard/products', icon: 'far fa-tags' },
                 { label: 'الفئات', link: '/dashboard/categories', icon: 'far fa-th-large' },
+                { label: 'المخازن', link: '/dashboard/stores', icon: 'far fa-store' },
             ],
         },
         {
@@ -87,18 +83,11 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         <>
             {/* Overlay for mobile */}
             {sidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                ></div>
+                <div className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)}></div>
             )}
 
-            <div
-                className={`fixed top-0 right-0 h-full pt-[60px] w-64 bg-gray-800 shadow-md z-50 transform 
-        ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'} 
-        transition-transform duration-300 ease-in-out 
-        lg:translate-x-0 lg:shadow-none`}
-            >
+            {/* Sidebar container */}
+            <div className={`fixed top-0 right-0 h-full pt-[60px] w-64 bg-gray-800 shadow-md z-50 transform  ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}  transition-transform duration-300 ease-in-out lg:translate-x-0 lg:shadow-none`} >
                 <div className="flex flex-col h-full">
                     <div className="p-4 overflow-auto flex-1">
                         {/* Render each section */}

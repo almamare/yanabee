@@ -2,34 +2,46 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, gql, useMutation } from "@apollo/client";
 import { debounce } from "lodash";
 import Toast from "@/components/Toast";
+import ConfirmDialog from "@/components/ConfirmDialog"; // Import ConfirmDialog component for confirmation dialogs
+
 
 // ====== استعلام GraphQL لجلب الباقات (التسعيرات) ====== //
 const PACKAGES_QUERY = gql`
-  query Packages($role: String, $type: String, $search: String, $page: Int, $limit: Int) {
-    packages(role: $role, type: $type, search: $search, page: $page, limit: $limit) {
-      total
-      pages
-      items {
-        id
-        user
-        name
-        role
-        package_type
-        states_price
-        regional_price
-        created_at
-        updated_at
-      }
+    query Packages($role: String, $type: String, $search: String, $page: Int, $limit: Int) {
+        packages(role: $role, type: $type, search: $search, page: $page, limit: $limit) {
+            total
+            pages
+            items {
+                id
+                user
+                name
+                role
+                package_type
+                states_price
+                regional_price
+                created_at
+                updated_at
+            }
+        }
     }
-  }
+`;
+
+const DELETE_PACKAGE_MUTATION = gql`
+    mutation DeletePackage($id: String) {
+        deletePackage(id: $id) {
+            id
+            status
+            message
+        }
+    }
 `;
 
 // (اختياري) تعريف الواجهات إذا كنت تستخدم TypeScript
 interface Package {
-    id: number;
+    id: string;
     user: string;
     name: string;
     role: string;
@@ -80,6 +92,12 @@ export default function PackagesPage() {
     const [totalPages, setTotalPages] = useState<number>(1);
     const [totalItems, setTotalItems] = useState<number>(0);
 
+    // Define the state variable for the confirmation dialog
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    // Define the state variable for the selected tutorial ID
+    const [selectId, setSelectId] = useState("");
+
     // حالة التنبيه (Toast)
     const [toast, setToast] = useState<{
         message: string;
@@ -88,7 +106,6 @@ export default function PackagesPage() {
 
     // أعمدة الجدول باللغة العربية وبالترتيب المطلوب
     const columns = [
-        { id: "id", name: "المعرف" },
         { id: "user", name: "المستخدم" },
         { id: "name", name: "الاسم" },
         { id: "role", name: "الدور" },
@@ -97,7 +114,10 @@ export default function PackagesPage() {
         { id: "regional_price", name: "السعر الإقليمي" },
         { id: "created_at", name: "تاريخ الإنشاء" },
         { id: "updated_at", name: "تاريخ التعديل" },
+        { id: "actions", name: "الإجراءات" },
     ];
+
+    const [deletePackage] = useMutation(DELETE_PACKAGE_MUTATION)
 
     // استعلام Apollo
     const { data, loading: queryLoading, error } = useQuery<PackagesResponse>(
@@ -113,6 +133,35 @@ export default function PackagesPage() {
             fetchPolicy: "network-only",
         }
     );
+
+    const handleDelete = async (id:string) => {
+        try {
+            const response = await deletePackage({
+                variables: { id: id },
+            });
+
+            if (response.data.deletePackage.status) {
+                setToast({ message: response.data?.deletePackage?.message, type: "success" });
+                setShowConfirm(false);
+                setPackages((prev) => prev.filter((pkg) => pkg.id !== id));
+            }
+        }
+        catch (err: any) {
+            if (err?.graphQLErrors && Array.isArray(err.graphQLErrors)) {
+                err.graphQLErrors.forEach((graphqlError: any) => {
+                    const validTypes: Array<"success" | "danger" | "warning" | "info"> = ["success", "danger", "warning", "info"];
+                    const toastType = validTypes.includes(graphqlError.extensions?.code)
+                        ? (graphqlError.extensions.code as "success" | "danger" | "warning" | "info")
+                        : "danger";
+                    setToast({ message: graphqlError.message, type: toastType });
+                });
+            } else if (err instanceof Error) {
+                setToast({ message: err.message, type: "danger" });
+            } else {
+                setToast({ message: "An unknown error occurred", type: "danger" });
+            }
+        }
+    };
 
     // دالة مبددة (debounce) للبحث
     const debouncedSearch = useCallback(
@@ -191,7 +240,6 @@ export default function PackagesPage() {
                 </ol>
             </nav>
 
-            {/* تبويبات لاختيار نوع التسعيرة (عادي / سريع) */}
             <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-300">
                 <ul className="flex flex-wrap -mb-px">
                     {tabs.map((tab) => (
@@ -199,8 +247,8 @@ export default function PackagesPage() {
                             <button
                                 onClick={() => handleTabChange(tab.id as keyof typeof typeMap)}
                                 className={`inline-block px-4 py-2 border-b-2 rounded-t-lg font-bold transition-colors duration-300 ${activeTab === tab.id
-                                        ? "bg-primary border-primary text-white"
-                                        : "border-transparent hover:text-primary hover:border-gray-300"
+                                    ? "bg-primary border-primary text-white"
+                                    : "border-transparent hover:text-primary hover:border-gray-300"
                                     }`}
                                 aria-current={activeTab === tab.id ? "page" : undefined}
                             >
@@ -223,52 +271,36 @@ export default function PackagesPage() {
                     </h5>
                 </div>
 
-                {/* اختيار الدور (فرع / عميل) والقائمة المنسدلة */}
-                <div className="flex items-center mb-3">
-                    <label htmlFor="roleSelect" className="text-sm font-medium text-gray-700 me-2">
-                        حدد الدور:
-                    </label>
-                    <select
-                        id="roleSelect"
-                        value={selectedRole}
-                        onChange={(e) => {
-                            setSelectedRole(e.target.value);
-                            setPage(1);
-                        }}
-                        className="px-3 py-1 border border-gray-300 bg-gray-50 rounded-md focus:outline-none text-sm focus:ring-primary focus:border-primary text-right"
-                    >
-                        {rolesList.map((role) => (
-                            <option key={role} value={role}>
-                                {role}
-                            </option>
-                        ))}
-                    </select>
-                </div>
 
-                {/* اختيار عدد العناصر والبحث */}
+
                 <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-3">
-                        <select
-                            id="entries"
-                            className="px-3 py-1 border border-gray-300 bg-gray-50 rounded-md focus:outline-none text-sm focus:ring-primary focus:border-primary text-right mx-2"
-                            value={itemsPerPage}
-                            onChange={(e) => {
-                                setPage(1);
-                                setItemsPerPage(Number(e.target.value));
-                            }}
-                        >
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                        </select>
-                        <label
-                            htmlFor="entries"
-                            className="text-sm font-medium text-gray-700"
-                        >
-                            العرض
-                        </label>
+                    <div className="flex flex-nowrap space-x-2 rtl:space-x-reverse">
+                        <div className="flex items-center">
+                            <label htmlFor="roleSelect" className="text-sm font-medium text-gray-700 me-2">
+                                حدد الدور
+                            </label>
+                            <select id="roleSelect" value={selectedRole} onChange={(e) => { setSelectedRole(e.target.value); setPage(1); }} className="px-3 py-1 border border-gray-300 bg-gray-50 rounded-md text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none text-right mx-2">
+                                {rolesList.map((role) => (
+                                    <option key={role} value={role}>
+                                        {role}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <label htmlFor="entries" className="text-sm font-medium text-gray-700 me-2">
+                                العرض
+                            </label>
+                            <select id="entries" className="px-3 py-1 border border-gray-300 bg-gray-50 rounded-md text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none text-right mx-2"
+                                value={itemsPerPage} onChange={(e) => { setPage(1); setItemsPerPage(Number(e.target.value)); }} >
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
                     </div>
+
 
                     <div className="flex items-center space-x-3">
                         <label
@@ -282,8 +314,7 @@ export default function PackagesPage() {
                             type="text"
                             placeholder="ابحث عن تسعيرة..."
                             onChange={(e) => debouncedSearch(e.target.value)}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:outline-none focus:ring-primary focus:border-primary block px-2 py-1"
-                        />
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1" />
                     </div>
                 </div>
 
@@ -312,22 +343,13 @@ export default function PackagesPage() {
                         <tbody className="text-gray-600 text-sm font-medium">
                             {error || packages.length === 0 ? (
                                 <tr>
-                                    <td
-                                        colSpan={columns.length}
-                                        className="text-center py-2 text-gray-500"
-                                    >
+                                    <td colSpan={columns.length} className="text-center py-2 text-gray-500" >
                                         لا توجد بيانات
                                     </td>
                                 </tr>
                             ) : (
                                 packages.map((pkg) => (
-                                    <tr
-                                        key={pkg.id}
-                                        className="border-b odd:bg-white even:bg-gray-50"
-                                    >
-                                        <td className="py-2 px-2 border border-slate-200">
-                                            {pkg.id}
-                                        </td>
+                                    <tr key={pkg.id} className="border-b odd:bg-white even:bg-gray-50" >
                                         <td className="py-2 px-2 border border-slate-200">
                                             {pkg.user}
                                         </td>
@@ -352,6 +374,14 @@ export default function PackagesPage() {
                                         <td className="py-2 px-2 border border-slate-200">
                                             {new Date(pkg.updated_at).toLocaleString()}
                                         </td>
+                                        <td className="py-2 px-2 border border-slate-200">
+                                            <Link href={`/dashboard/packages/update/${pkg.id}`} className="px-2 py-1 text-xs ml-2 font-medium text-center text-white bg-blue-600 hover:bg-blue-700 rounded-md" >
+                                                تعديل
+                                            </Link>
+                                            <button className="px-3 py-1 text-xs font-medium text-center text-white bg-red-600 hover:bg-red-700 rounded-md" onClick={() => { setSelectId(pkg.id); setShowConfirm(true); }}>
+                                                حذف
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))
                             )}
@@ -362,36 +392,24 @@ export default function PackagesPage() {
                 {/* أدوات الترقيم (Pagination) */}
                 <div className="py-3 flex items-center justify-between">
                     <span>
-                        <button
-                            onClick={prevPage}
-                            disabled={page <= 1}
-                            className="text-white bg-primary hover:bg-primary disabled:bg-gray-400 px-4 py-1 rounded-md"
-                        >
+                        <button onClick={prevPage} disabled={page <= 1} className="text-white bg-primary hover:bg-primary disabled:bg-gray-400 px-4 py-1 rounded-md" >
                             <i className="fas fa-angle-right"></i> السابق
                         </button>
                         <span className="mx-3">
                             {page} / {totalPages}
                         </span>
-                        <button
-                            onClick={nextPage}
-                            disabled={page >= totalPages}
-                            className="text-white bg-primary hover:bg-primary disabled:bg-gray-400 px-4 py-1 rounded-md"
-                        >
+                        <button onClick={nextPage} disabled={page >= totalPages} className="text-white bg-primary hover:bg-primary disabled:bg-gray-400 px-4 py-1 rounded-md" >
                             التالي <i className="fas fa-angle-left"></i>
                         </button>
                     </span>
-                    <span>إجمالي النتائج: {totalItems}</span>
+                    <span>المجموع ( {totalItems} )</span>
                 </div>
             </div>
 
-            {/* تنبيهات (Toast) في حال وجود رسائل */}
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast(null)}
-                />
-            )}
+            {/* Confirmation dialog for delete action */}
+            {showConfirm && (<ConfirmDialog message="هل تريد حذف هذا العنصر؟ اضغط على موافق للتأكيد." onConfirm={() => { if (selectId) { handleDelete(selectId) } }} onCancel={() => setShowConfirm(false)} />)}
+
+            {toast && (<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />)}
         </>
     );
 }

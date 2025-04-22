@@ -11,7 +11,7 @@ const useCreateApolloClient = () => {
 
   // Create an HttpLink to your GraphQL endpoint
   const httpLink = new HttpLink({
-    uri: 'https://statics.yanabie.com/', // Replace with your GraphQL endpoint
+    uri: 'http://localhost/admin/', // Replace with your GraphQL endpoint
   });
 
   // Create an authLink to set the Authorization header

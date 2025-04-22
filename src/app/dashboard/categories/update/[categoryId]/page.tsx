@@ -123,7 +123,7 @@ export default function UpdateCategory({ params, }: { params: { categoryId: stri
                                     اسم الفئة <span className="text-red-500">*</span>
                                 </label>
                                 <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: إلكترونيات"
-                                    className="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary px-2 py-1" required />
+                                    className="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1" required />
                             </div>
 
                             {/* ---- Description ---- */}
@@ -131,7 +131,7 @@ export default function UpdateCategory({ params, }: { params: { categoryId: stri
                                 <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-700" >
                                     الوصف
                                 </label>
-                                <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary px-2 py-1 w-full" placeholder="وصف مختصر عن الفئة" />
+                                <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none block px-2 py-1" placeholder="وصف مختصر عن الفئة" />
                             </div>
 
                             {/* ---- Image ---- */}
