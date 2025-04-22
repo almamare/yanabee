@@ -8,14 +8,14 @@ import Toast from "@/components/Toast"; // Re‑usable toast
 import { GET_USER } from "@/graphql/queries/users"; // ⭐️ استعلام جلب مستخدم
 import { UPDATE_USER } from "@/graphql/mutations/users"; // ⭐️ طفرة تعديل مستخدم
 
-export interface User {
+ interface User {
     name: string;
     surname: string;
     phone: string;
     email: string;
 }
 
-export interface UserData {
+ interface UserData {
     user: User;
 }
 

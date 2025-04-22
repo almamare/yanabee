@@ -9,7 +9,7 @@ import Toast from "@/components/Toast"; // Re‑usable toast component
 /* =========[ GraphQL operations ]========= */
 
 // 1) عناوين المستخدم (لجلب القيم الحالية)
-export const GET_USER_ADDRESS = gql`
+ const GET_USER_ADDRESS = gql`
   query User($user_id: String!) {
     user(user_id: $user_id) {
       address {
@@ -26,7 +26,7 @@ export const GET_USER_ADDRESS = gql`
 `;
 
 // 2) كل المحافظات
-export const STATES_QUERY = gql`
+ const STATES_QUERY = gql`
   query States {
     states {
       state_code
@@ -36,7 +36,7 @@ export const STATES_QUERY = gql`
 `;
 
 // 3) مدن محافظة معيَّنة
-export const CITIES_QUERY = gql`
+ const CITIES_QUERY = gql`
   query Cities($state_code: String!) {
     cities(state_code: $state_code) {
       city_code
@@ -46,7 +46,7 @@ export const CITIES_QUERY = gql`
 `;
 
 // 4) مناطق مدينة معيَّنة
-export const DISTRICTS_QUERY = gql`
+ const DISTRICTS_QUERY = gql`
   query Districts($city_code: String!) {
     districts(city_code: $city_code) {
       district_id
@@ -56,7 +56,7 @@ export const DISTRICTS_QUERY = gql`
 `;
 
 // 5) تحديث العنوان
-export const UPDATE_ADDRESS = gql`
+ const UPDATE_ADDRESS = gql`
   mutation UpdateAddress(
     $user_id: String!
     $name: String!
@@ -84,7 +84,7 @@ export const UPDATE_ADDRESS = gql`
 
 /* =========[ Types ]========= */
 // Type for the address object
-export interface Address {
+ interface Address {
     id: string;
     name: string;
     phone: string;
@@ -94,11 +94,11 @@ export interface Address {
     address: string;
 }
 // Type for the user object
-export interface User {
+ interface User {
     address: Address;
 }
 // Type for the GraphQL response
-export interface UserResponse {
+ interface UserResponse {
     user: User;
 }
 
