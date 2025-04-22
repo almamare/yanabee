@@ -15,7 +15,7 @@ import Toast from "@/components/Toast"; // toast notifications
 /* =====================
    GraphQL – Dashboard Query
    ===================== */
-export const GET_DASHBOARD = gql`
+ const GET_DASHBOARD = gql`
   query Dashboard {
     dashboard {
       users {
