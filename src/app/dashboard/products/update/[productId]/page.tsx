@@ -9,7 +9,7 @@ import Toast from "@/components/Toast";
 /* ========== GraphQL ========== */
 
 // 1) جلب بيانات الباكج المطلوب تعديله
-export const GET_PACKAGE = gql`
+ const GET_PACKAGE = gql`
   query Package($id: String!) {
     package(id: $id) {
       id
@@ -26,7 +26,7 @@ export const GET_PACKAGE = gql`
 `;
 
 // 2) تحديث التسعير
-export const UPDATE_PACKAGE = gql`
+ const UPDATE_PACKAGE = gql`
   mutation UpdatePackage(
     $id: String!
     $states_price: String
