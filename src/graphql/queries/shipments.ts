@@ -35,3 +35,25 @@ export const SHIPMENTS_QUERY = gql`
         }
     }
 `;
+
+
+// Define the query to get a shipment by ID
+export const SEARCH_SHIPMENTS = gql`
+  query SearchShipment($order_no: String, $tracking_no: String, $created_at: String) {
+    searchShipment(order_no: $order_no, tracking_no: $tracking_no, created_at: $created_at) {
+      id
+      order_no
+      tracking_no
+      note
+      amount
+      status
+      role
+      shipment_type
+      archives
+      order_type
+      created_at
+      updated_at
+      delivered_date
+    }
+  }
+`;

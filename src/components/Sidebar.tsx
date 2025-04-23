@@ -38,8 +38,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             items: [
                 { label: 'لوحة التحكم', link: '/dashboard', icon: 'far fa-tachometer-alt-fast' },
                 { label: 'الطلبات', link: '/dashboard/orders', icon: 'far fa-box-alt' },
-                { label: 'التقارير', link: '#', icon: 'far fa-chart-bar' },
-                { label: 'الاستعلام', link: '#', icon: 'far fa-search' },
+                { label: 'الاستعلام', link: '/dashboard/search', icon: 'far fa-search' },
                 { label: 'التنبيهات', link: '/dashboard/notifications', icon: 'far fa-bell' },
                 { label: 'المحادثات', link: '#', icon: 'far fa-comment-alt', badge: 5 },
 
